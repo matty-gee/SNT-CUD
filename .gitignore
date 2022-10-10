@@ -1,10 +1,9 @@
 # see: https://gist.github.com/octocat/9257657
 
 *nilearn_cache
-
-# files potentially containing sensitive info
-######################
+*ipynb_checkpoints
 *participants.tsv
+
 
 # Compiled source #
 ###################
