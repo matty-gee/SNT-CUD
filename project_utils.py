@@ -1,32 +1,32 @@
 #!/usr/bin/env python3
 
+############################################################################################################
+# modules
+############################################################################################################
+
 import sys, os, glob, warnings
 if not sys.warnoptions: warnings.simplefilter("ignore")
-from pathlib import Path
 
-# add code directories
+import nibabel as nib
+import nilearn as nil
+import pandas as pd
+import numpy as np
+
+# add custom code
+from pathlib import Path
 user = Path.home()
-proj_dir = Path(f'{user}/Dropbox/Projects/CUD') # put on github!
-code_dir = Path(f'{user}/Dropbox/Projects/Code')
-paths = ['..', f'{proj_dir}/Code/fMRI/func_conn', f'{code_dir}/fMRI/GLMs/2nd_level', f'{code_dir}/utilities', f'{code_dir}/snt_behavior/preprocessing']
+code_dir = Path(f'{user}/Dropbox/Projects')
+parcellation_dir = Path(f'{code_dir}/fMRI_tools/parcellations')
+paths = ['..', 
+         f'{code_dir}/SNT-CUD',
+         f'{code_dir}/generic_utilities', 
+         f'{code_dir}/fMRI_tools/func_conn', 
+         f'{code_dir}/fMRI_tools/GLMs/2nd_level', 
+         f'{code_dir}/social_navigation_task']
+
 [sys.path.insert(0, str(Path(p))) for p in paths if str(Path(p)) not in sys.path] # convert Path obj to string to add to system path
 # sys.path.remove(Path(p)) 
 
-# add data directories
-syn_dir = Path('/Volumes/synapse/projects/SocialSpace/Projects/SNT-fmri_CUD')
-if syn_dir.exists():
-    lsa_dir  = Path(f'{syn_dir}/Analyses/GLMs_fieldmaps_rp/lsa_decision')
-    beta_dir = Path(f'{lsa_dir}/images')
-    fc_dir   = Path(f'{lsa_dir}/roi_fc')
-    ts_dir   = Path(f'{lsa_dir}/roi_timeseries')
-    beh_dir  = Path(f'{syn_dir}/Data/Behavior')
-    mask_dir = Path(f'{syn_dir}/Masks')
-else:
-    print('Synapse not connected - assuming timeseries and roi fcs are on Deskop/CUD')
-    fc_dir = Path(f'{user}/Desktop/CUD/lsa_decision/roi_fc')
-    ts_dir = Path(f'{user}/Desktop/CUD/lsa_decision/roi_timeseries')
-
-# modules
 from snt_info import *
 from generic import read_excel, find_files, pickle_file, load_pickle, get_strings_matching_substrings
 from matrices import *
@@ -37,13 +37,26 @@ import plotting as plot
 from functional_connectivity import *
 import second_level
 
-########################################################################################################
-## behavioral data
-########################################################################################################
+############################################################################################################
+# data
+############################################################################################################
+
+# add data directories
+data_dir = Path('/Volumes/synapse/projects/SocialSpace/Projects/SNT-fmri_CUD')
+if data_dir.exists():
+    lsa_dir  = Path(f'{data_dir}/Analyses/GLMs_fieldmaps_rp/lsa_decision')
+    beta_dir = Path(f'{lsa_dir}/images')
+    fc_dir   = Path(f'{lsa_dir}/roi_fc')
+    ts_dir   = Path(f'{lsa_dir}/roi_timeseries')
+    beh_dir  = Path(f'{data_dir}/Data/Behavior')
+    mask_dir = Path(f'{data_dir}/Masks')
+    
+else:
+    print('Synapse not connected!')
 
 try:    
-    beh_df  = pd.read_excel(find_files(f'{syn_dir}/Data/Summary', 'All-data_summary_n*.xlsx')[0])
-    incl_df = pd.read_excel(find_files(syn_dir, 'participants_qc_n*.xlsx')[0])
+    beh_df  = pd.read_excel(find_files(f'{data_dir}/Data/Summary', 'All-data_summary_n*.xlsx')[0])
+    incl_df = pd.read_excel(find_files(data_dir, 'participants_qc_n*.xlsx')[0])
     beh_df  = incl_df[['sub_id','inclusion','memory_incl','fd_incl','other_incl']].merge(beh_df, on='sub_id')
     pmod_fnames = find_files(beh_dir, '*pmods*')
 except: 
