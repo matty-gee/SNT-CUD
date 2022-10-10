@@ -11,31 +11,28 @@ import nibabel as nib
 import nilearn as nil
 import pandas as pd
 import numpy as np
-
-# add custom code
 from pathlib import Path
-user = Path.home()
-code_dir = Path(f'{user}/Dropbox/Projects')
-parcellation_dir = Path(f'{code_dir}/fMRI_tools/parcellations')
-paths = ['..', 
-         f'{code_dir}/SNT-CUD',
-         f'{code_dir}/generic_utilities', 
-         f'{code_dir}/fMRI_tools/func_conn', 
-         f'{code_dir}/fMRI_tools/GLMs/2nd_level', 
-         f'{code_dir}/social_navigation_task']
 
-[sys.path.insert(0, str(Path(p))) for p in paths if str(Path(p)) not in sys.path] # convert Path obj to string to add to system path
-# sys.path.remove(Path(p)) 
+# expects 'fMRI_tools' to be one directory up...
+cd   = str(Path(__file__).resolve())
+fsep = str(Path('/'))
+proj_dir = Path((fsep).join(cd.split(fsep)[0:-1])) # remove fname for project direcotry
+print(f'Project directory: {proj_dir}')
+tools_dir = Path(f'{(fsep).join(cd.split(fsep)[0:-2])}{fsep}fMRI_tools') 
+
+paths = ['..', proj_dir,
+         f'{tools_dir}/utilities_general', f'{tools_dir}/func_conn']
+
+[sys.path.insert(0, str(Path(p))) for p in paths if str(Path(p)) not in sys.path] # have to convert Path obj to string to add to system path
+# to remove: sys.path.remove(Path(p)) 
 
 from snt_info import *
 from generic import read_excel, find_files, pickle_file, load_pickle, get_strings_matching_substrings
 from matrices import *
 from circ_stats import *
-from regression import * 
-from classification import * 
-import plotting as plot
 from functional_connectivity import *
-import second_level
+
+parcellation_dir = Path(f'{tools_dir}/parcellations')
 
 ############################################################################################################
 # data
@@ -50,22 +47,33 @@ if data_dir.exists():
     ts_dir   = Path(f'{lsa_dir}/roi_timeseries')
     beh_dir  = Path(f'{data_dir}/Data/Behavior')
     mask_dir = Path(f'{data_dir}/Masks')
-    
-else:
-    print('Synapse not connected!')
+else: print('Synapse not connected!')
 
 try:    
     beh_df  = pd.read_excel(find_files(f'{data_dir}/Data/Summary', 'All-data_summary_n*.xlsx')[0])
     incl_df = pd.read_excel(find_files(data_dir, 'participants_qc_n*.xlsx')[0])
     beh_df  = incl_df[['sub_id','inclusion','memory_incl','fd_incl','other_incl']].merge(beh_df, on='sub_id')
     pmod_fnames = find_files(beh_dir, '*pmods*')
-except: 
-    print(f'Behavioral data not found')
+except: print(f'Behavioral data not found')
+
+
+########################################################################################################
+# snt details
+########################################################################################################
+
+task_details = pd.read_excel(Path(f'{proj_dir}/snt_details.xlsx'))
+task_details.sort_values(by='slide_num', inplace=True)
+decision_details = task_details[task_details['trial_type'] == 'Decision']
 
 # timing for decision trial epochs
 decision_epochs = []
 for on, off in zip(decision_details['onset'].values, decision_details['offset'].values):
     decision_epochs.extend(np.arange(int(np.round(on)), int(np.round(off))))
+
+# defaults
+character_roles  = ['first', 'second', 'assistant', 'powerful', 'boss'] # order of matlab outputs...
+character_colors = ['green', 'blue', 'orange', 'purple', 'red']
+group_colors     = ["#14C8FF", "#FD25A7"] # blue, pink - for plotting colors
 
 ########################################################################################################
 ## project helper functions
