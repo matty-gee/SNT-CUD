@@ -21,7 +21,8 @@ print(f'Project directory: {proj_dir}')
 tools_dir = Path(f'{(fsep).join(cd.split(fsep)[0:-2])}{fsep}fMRI_tools') 
 
 paths = ['..', proj_dir,
-         f'{tools_dir}/utilities_general', f'{tools_dir}/func_conn']
+         f'{tools_dir}/utilities_general', 
+         f'{tools_dir}/func_conn']
 
 [sys.path.insert(0, str(Path(p))) for p in paths if str(Path(p)) not in sys.path] # have to convert Path obj to string to add to system path
 # to remove: sys.path.remove(Path(p)) 

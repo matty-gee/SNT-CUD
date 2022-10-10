@@ -1,0 +1,13 @@
+name: snt-cud
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.7
+  -
+
+# to activate: $ conda activate snt-cud
+# to update (w/o having to activate first): $ conda env update --name snt-cud --file environment.yml --prune
+# -- https://stackoverflow.com/questions/42352841/how-to-update-an-existing-conda-environment-with-a-yml-file
+# to deactivate: $ conda deactivate
+
+# if get ResolvePackageNotFound error, read this: https://stackoverflow.com/questions/49154899/resolvepackagenotfound-create-env-using-conda-and-yml-file-on-macos
