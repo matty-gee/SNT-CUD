@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 
-############################################################################################################
-# modules
-############################################################################################################
-
 import sys, os, glob, warnings
 if not sys.warnoptions: warnings.simplefilter("ignore")
 
@@ -13,27 +9,27 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 
-# expects 'fMRI_tools' to be one directory up...
-cd   = str(Path(__file__).resolve())
-fsep = str(Path('/'))
-proj_dir = Path((fsep).join(cd.split(fsep)[0:-1])) # remove fname for project direcotry
-print(f'Project directory: {proj_dir}')
-tools_dir = Path(f'{(fsep).join(cd.split(fsep)[0:-2])}{fsep}fMRI_tools') 
+# # expects 'fMRI_tools' to be one directory up...
+# cd   = str(Path(__file__).resolve())
+# fsep = str(Path('/'))
+# proj_dir = Path((fsep).join(cd.split(fsep)[0:-1])) # remove fname for project direcotry
+# print(f'Project directory: {proj_dir}')
+# tools_dir = Path(f'{(fsep).join(cd.split(fsep)[0:-2])}{fsep}fMRI_tools') 
 
-paths = ['..', proj_dir,
-         f'{tools_dir}/utilities_general', 
-         f'{tools_dir}/func_conn']
+# paths = ['..', proj_dir,
+#          f'{tools_dir}/utilities_general', 
+#          f'{tools_dir}/func_conn']
 
-[sys.path.insert(0, str(Path(p))) for p in paths if str(Path(p)) not in sys.path] # have to convert Path obj to string to add to system path
-# to remove: sys.path.remove(Path(p)) 
+# [sys.path.insert(0, str(Path(p))) for p in paths if str(Path(p)) not in sys.path] # have to convert Path obj to string to add to system path
+# # to remove: sys.path.remove(Path(p)) 
 
-from snt_info import *
-from generic import read_excel, find_files, pickle_file, load_pickle, get_strings_matching_substrings
-from matrices import *
-from circ_stats import *
-from functional_connectivity import *
+# # from snt_info import *
+# from generic import read_excel, find_files, pickle_file, load_pickle, get_strings_matching_substrings
+# from matrices import *
+# from circ_stats import *
+# from functional_connectivity import *
 
-parcellation_dir = Path(f'{tools_dir}/parcellations')
+# parcellation_dir = Path(f'{tools_dir}/parcellations')
 
 ############################################################################################################
 # data
@@ -59,20 +55,32 @@ except: print(f'Behavioral data not found')
 
 
 ########################################################################################################
-# snt details
+# snt plotting
 ########################################################################################################
-
-task_details = pd.read_excel(Path(f'{proj_dir}/snt_details.xlsx'))
-task_details.sort_values(by='slide_num', inplace=True)
-decision_details = task_details[task_details['trial_type'] == 'Decision']
 
 # timing for decision trial epochs
 decision_epochs = []
 for on, off in zip(decision_details['onset'].values, decision_details['offset'].values):
     decision_epochs.extend(np.arange(int(np.round(on)), int(np.round(off))))
 
-# defaults
-character_roles  = ['first', 'second', 'assistant', 'powerful', 'boss'] # order of matlab outputs...
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+import nibabel as nib
+from nilearn import plotting, image
+import matplotlib.patches as mpatches
+
+# define plotting vraibles 
+edgecolor = ".2"
+tick_fontsize  = 10
+label_fontsize = 13
+title_fontsize = 15 #20
+bar_width = 0.15 # this is a proportion of the total??
+figsize = (5, 5)
+facet_figsize = (5, 7.5)
+roi_pal = sns.color_palette("Paired")
+distance_pal = sns.color_palette("Purples")
+
 character_colors = ['green', 'blue', 'orange', 'purple', 'red']
 group_colors     = ["#14C8FF", "#FD25A7"] # blue, pink - for plotting colors
 

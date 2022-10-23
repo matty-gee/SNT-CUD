@@ -283,22 +283,7 @@ def remove_neutrals(arr):
 ## plotting stuff
 ########################################################################################################################
 
-import seaborn as sns
-import matplotlib.pyplot as plt
-import nibabel as nib
-from nilearn import plotting, image
-import matplotlib.patches as mpatches
 
-# define plotting vraibles 
-edgecolor = ".2"
-tick_fontsize  = 10
-label_fontsize = 13
-title_fontsize = 15 #20
-bar_width = 0.15 # this is a proportion of the total??
-figsize = (5, 5)
-facet_figsize = (5, 7.5)
-roi_pal = sns.color_palette("Paired")
-distance_pal = sns.color_palette("Purples")
 
 
 #############################################
